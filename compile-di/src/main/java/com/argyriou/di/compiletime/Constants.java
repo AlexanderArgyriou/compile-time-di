@@ -4,5 +4,5 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Constants {
-    public String PACKAGE = "java";
+    public String PACKAGE = "com.argyriou.di.compiletime";
 }
