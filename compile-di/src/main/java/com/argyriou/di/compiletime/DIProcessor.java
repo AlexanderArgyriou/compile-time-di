@@ -19,7 +19,7 @@ public class DIProcessor
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         try {
-            new BeanBucketGenerator(processingEnv).generate();
+            new BeanIfGenerator(processingEnv).generate();
             new BeanBucketGenerator(processingEnv).generate();
             new ContextGenerator(processingEnv, roundEnv).generate();
         } catch (Exception e) {
