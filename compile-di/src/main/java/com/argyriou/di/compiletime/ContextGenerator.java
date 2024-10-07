@@ -1,4 +1,5 @@
 package com.argyriou.di.compiletime;
 
-public final class ContextGenerator implements Generator {
+public final class ContextGenerator
+        implements Generator {
 }

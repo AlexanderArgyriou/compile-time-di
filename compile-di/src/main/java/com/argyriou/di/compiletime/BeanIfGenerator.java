@@ -1,4 +1,5 @@
 package com.argyriou.di.compiletime;
 
-public final class BeanIfGenerator implements Generator {
+public final class BeanIfGenerator
+        implements Generator {
 }
