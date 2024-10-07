@@ -15,7 +15,7 @@ import javax.lang.model.util.ElementFilter;
 import java.util.List;
 import java.util.Set;
 
-import static com.argyriou.di.compiletime.Constants.PACKAGE;
+import static com.argyriou.di.compiletime.Constants.*;
 
 @RequiredArgsConstructor
 public final class ContextGenerator

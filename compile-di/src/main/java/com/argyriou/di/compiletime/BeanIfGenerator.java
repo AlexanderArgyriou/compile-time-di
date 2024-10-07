@@ -12,7 +12,7 @@ import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
 
-import static com.argyriou.di.compiletime.Constants.PACKAGE;
+import static com.argyriou.di.compiletime.Constants.*;
 
 @RequiredArgsConstructor
 public final class BeanIfGenerator
