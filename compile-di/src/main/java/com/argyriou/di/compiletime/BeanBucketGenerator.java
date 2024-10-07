@@ -30,7 +30,8 @@ public final class BeanBucketGenerator
         writeFileOnClasspath(processingEnv, beanBucketClass);
     }
 
-    private static void writeFileOnClasspath(
+    @Override
+    public void writeFileOnClasspath(
             @NonNull final ProcessingEnvironment processingEnv,
             @NonNull final TypeSpec beanBucketClass) {
         try {
@@ -73,7 +74,8 @@ public final class BeanBucketGenerator
                 .addAnnotation(Override.class)
                 .addTypeVariable(TypeVariableName.get("T"))
                 .returns(TypeVariableName.get("T"))
-                .addParameter(ParameterizedTypeName.get(ClassName.get(Class.class), TypeVariableName.get("T")), "type")
+                .addParameter(ParameterizedTypeName.get(ClassName.get(Class.class),
+                        TypeVariableName.get("T")), "type")
                 .addStatement("return (T) beans.get(type.getName())")
                 .build();
     }
