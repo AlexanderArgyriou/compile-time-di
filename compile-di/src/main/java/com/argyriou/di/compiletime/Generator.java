@@ -10,7 +10,7 @@ public sealed interface Generator
         BeanBucketGenerator,
         BeanIfGenerator,
         ContextGenerator {
-    void generate(@NonNull final ProcessingEnvironment processingEnv);
+    void generate();
 
     void writeFileOnClasspath(
             @NonNull final ProcessingEnvironment processingEnv,

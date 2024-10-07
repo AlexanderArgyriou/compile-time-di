@@ -2,6 +2,7 @@ package com.argyriou.di.compiletime;
 
 import com.squareup.javapoet.*;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -13,11 +14,13 @@ import java.util.Map;
 
 import static com.argyriou.di.compiletime.Constants.PACKAGE;
 
+@RequiredArgsConstructor
 public final class BeanBucketGenerator
         implements Generator {
+    private final ProcessingEnvironment processingEnv;
+
     @Override
-    public void generate(
-            @NonNull final ProcessingEnvironment processingEnv) {
+    public void generate() {
         if (classExists(processingEnv, PACKAGE + ".BeanBucket")) {
             return;
         }
