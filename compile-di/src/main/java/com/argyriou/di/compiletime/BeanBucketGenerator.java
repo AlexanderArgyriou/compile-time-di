@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.argyriou.di.compiletime.Constants.PACKAGE;
+import static com.argyriou.di.compiletime.Constants.*;
 
 @RequiredArgsConstructor
 public final class BeanBucketGenerator
