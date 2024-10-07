@@ -41,14 +41,14 @@ public class DIProcessor
     public void generateContext(RoundEnvironment roundEnv)
             throws IOException {
         if (classExists("com.argyriou.di.compiletime.Context")) {
-            // Don't recreate the file if it already exists
             return;
         }
-        // Define the package
+
         String packageName = "com.argyriou.di.compiletime";
 
-        // Create the BeanBucket field
-        FieldSpec beanBucketField = FieldSpec.builder(ClassName.get(packageName, "BeanBucket"), "beanBucket", Modifier.PRIVATE, Modifier.FINAL)
+        FieldSpec beanBucketField = FieldSpec.builder(
+                ClassName.get(packageName, "BeanBucket"),
+                        "beanBucket", Modifier.PRIVATE, Modifier.FINAL)
                 .build();
 
         // Create the constructor
