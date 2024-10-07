@@ -1,6 +1,7 @@
 package com.argyriou.di.compiletime;
 
 import com.argyriou.di.beans.definitions.Bean;
+import com.argyriou.di.beans.definitions.Inject;
 import com.squareup.javapoet.*;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +59,11 @@ public final class ContextGenerator
                     = Character.toLowerCase(be.getSimpleName().charAt(0)) + be.getSimpleName().toString().substring(1);
 
             List<VariableElement> fields =
-                    ElementFilter.fieldsIn(be.getEnclosedElements());
+                    ElementFilter.fieldsIn(be.getEnclosedElements())
+                            .stream()
+                            .filter(f -> f.getAnnotation(Inject.class) != null)
+                            .toList();
+
             fields.forEach(dep -> {
                 TypeName fieldTypeName = ClassName.get(dep.asType());
                 String lowercasedDepName = Character.toLowerCase(dep.getSimpleName().charAt(0))

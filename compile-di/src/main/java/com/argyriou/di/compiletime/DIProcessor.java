@@ -17,7 +17,9 @@ import java.util.Set;
 public class DIProcessor
         extends AbstractProcessor {
     @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    public boolean process(
+            Set<? extends TypeElement> annotations,
+            RoundEnvironment roundEnv) {
         try {
             new BeanIfGenerator(processingEnv).generate();
             new BeanBucketGenerator(processingEnv).generate();
