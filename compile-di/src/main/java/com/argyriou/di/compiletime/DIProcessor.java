@@ -9,6 +9,7 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.util.Set;
 
+// TODO: create a rest client interface and produce dynamic proxy at runtime
 @SupportedAnnotationTypes({
         "com.argyriou.di.beans.definitions.Bean",
         "com.argyriou.di.beans.definitions.Inject"
