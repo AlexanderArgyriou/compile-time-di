@@ -13,22 +13,27 @@ import java.util.concurrent.Executors;
 
 public class VirtualOctopusServer {
     private final HttpServer server;
-    private final Context context;
+    private Context context;
 
     public VirtualOctopusServer(
-            final int port,
-            final String initPath) throws IOException {
+            final int port) throws IOException {
         this.server = HttpServer.create(
                 new InetSocketAddress(port), 0
         );
-        this.context = new Context();
-
-        server.createContext(initPath, BasePathHandler.getNew(context));
     }
 
-    public void start() {
+    public void loadContext() {
+        this.context = new Context();
+    }
+
+    public void start(final String initPath) {
+        server.createContext(initPath, BasePathHandler.getNew(context));
         server.setExecutor(Executors.newSingleThreadExecutor());
         server.start();
+    }
+
+    public void stop() {
+        server.stop(0);
     }
 
     static class BasePathHandler

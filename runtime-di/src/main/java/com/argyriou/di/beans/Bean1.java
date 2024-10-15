@@ -9,6 +9,8 @@ public class Bean1 {
     private Bean2 bean2;
     @Inject
     private Bean3 bean3;
+    @Inject
+    private Bean4 bean4;
 
     public String check() {
         return bean2.sayHi();
