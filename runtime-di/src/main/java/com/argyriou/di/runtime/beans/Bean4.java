@@ -1,4 +1,4 @@
-package com.argyriou.di.beans;
+package com.argyriou.di.runtime.beans;
 
 import com.argyriou.di.beans.definitions.Bean;
 

@@ -1,4 +1,4 @@
-package com.argyriou.di.context;
+package com.argyriou.di.runtime.context;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,11 +1,11 @@
-package com.argyriou.di.context;
+package com.argyriou.di.runtime.context;
 
 import com.argyriou.di.beans.definitions.Bean;
 import com.argyriou.di.beans.definitions.Inject;
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 
 import java.util.Arrays;
-import java.util.Set;
 
 public class Context {
     private final BeanBucket beanBucket;
@@ -20,7 +20,8 @@ public class Context {
     }
 
     public void init() {
-        var reflections = new Reflections("com.argyriou.di.beans");
+        var reflections = new Reflections("com.argyriou.di.runtime.beans",
+                Scanners.FieldsAnnotated, Scanners.TypesAnnotated);
         var allClasses = reflections.getTypesAnnotatedWith(Bean.class);
         var fieldsToInject = reflections.getFieldsAnnotatedWith(Inject.class);
 

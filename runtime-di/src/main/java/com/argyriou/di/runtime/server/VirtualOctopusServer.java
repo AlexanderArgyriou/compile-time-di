@@ -1,7 +1,7 @@
-package com.argyriou.di.server;
+package com.argyriou.di.runtime.server;
 
-import com.argyriou.di.beans.Bean1;
-import com.argyriou.di.context.Context;
+import com.argyriou.di.runtime.beans.Bean1;
+import com.argyriou.di.runtime.context.Context;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -16,24 +16,23 @@ public class VirtualOctopusServer {
     private Context context;
 
     public VirtualOctopusServer(
-            final int port) throws IOException {
+            final int port,
+            final String initPath) throws IOException {
         this.server = HttpServer.create(
                 new InetSocketAddress(port), 0
         );
+        this.context = new Context();
+
+        server.createContext(initPath, BasePathHandler.getNew(context));
     }
 
     public void loadContext() {
         this.context = new Context();
     }
 
-    public void start(final String initPath) {
-        server.createContext(initPath, BasePathHandler.getNew(context));
+    public void start() {
         server.setExecutor(Executors.newSingleThreadExecutor());
         server.start();
-    }
-
-    public void stop() {
-        server.stop(0);
     }
 
     static class BasePathHandler
