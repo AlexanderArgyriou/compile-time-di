@@ -21,7 +21,7 @@ public class VirtualOctopusServer {
         this.server = HttpServer.create(
                 new InetSocketAddress(port), 0
         );
-        this.context = new Context();
+        loadContext();
 
         server.createContext(initPath, BasePathHandler.getNew(context));
     }
