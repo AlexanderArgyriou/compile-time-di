@@ -9,6 +9,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.tools.Diagnostic;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,33 +18,26 @@ import static com.argyriou.di.compiletime.Constants.*;
 @RequiredArgsConstructor
 public final class BeanBucketGenerator
         implements Generator {
-    private final ProcessingEnvironment processingEnv;
 
     @Override
     public void generate() {
-        if (classExists(processingEnv, PACKAGE + ".BeanBucket")) {
-            return;
-        }
-
         FieldSpec beansMap = constructBeansMap();
         MethodSpec getMethod = constructGetBeanGenericMethodImpl();
         MethodSpec addMethod = constructGenericAddBeanMethodImpl();
         TypeSpec beanBucketClass = constructBeanBucktClass(beansMap, getMethod, addMethod);
 
-        writeFileOnClasspath(processingEnv, beanBucketClass);
+        writeFileOnClasspath(beanBucketClass);
     }
 
     @Override
     public void writeFileOnClasspath(
-            @NonNull final ProcessingEnvironment processingEnv,
             @NonNull final TypeSpec beanBucketClass) {
         try {
             JavaFile javaFile = JavaFile.builder(PACKAGE, beanBucketClass)
                     .build();
-            Filer filer = processingEnv.getFiler();
-            javaFile.writeTo(filer);
+            javaFile.writeTo(Paths.get("target/generated-sources/java"));
         } catch (IOException e) {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
+            e.printStackTrace();
         }
     }
 

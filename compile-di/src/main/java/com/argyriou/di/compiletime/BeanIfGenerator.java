@@ -11,43 +11,30 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Paths;
 
 import static com.argyriou.di.compiletime.Constants.*;
 
 @RequiredArgsConstructor
 public final class BeanIfGenerator
         implements Generator {
-    private final ProcessingEnvironment processingEnv;
-
     @Override
     public void generate() {
-        if (classExists(processingEnv, PACKAGE + ".Bucket")) {
-            return;
-        }
-
         MethodSpec getMethod = constructGenericGetBeanIfMethod();
         MethodSpec addMethod = constructGenericAddBeanIfMethod();
         TypeSpec beanBucketIf = constructBeanInterface(getMethod, addMethod);
 
-        writeFileOnClasspath(processingEnv, beanBucketIf);
+        writeFileOnClasspath(beanBucketIf);
     }
 
     @Override
     public void writeFileOnClasspath(
-            @NonNull final ProcessingEnvironment processingEnv,
             @NonNull final TypeSpec clazz) {
         try {
             JavaFile javaFile = JavaFile.builder(PACKAGE, clazz).build();
-            String generatedCode = javaFile.toString();
-            String finalCode = generatedCode
-                    .replaceFirst("Bucket \\{", "Bucket permits BeanBucket {");
-            Filer filer = processingEnv.getFiler();
-            JavaFileObject sourceFile = filer.createSourceFile(PACKAGE + ".Bucket");
-            try (Writer writer = sourceFile.openWriter()) {
-                writer.write(finalCode);
-            }
+            javaFile.writeTo(Paths.get("target/generated-sources/java"));
         } catch (IOException e) {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -55,7 +42,7 @@ public final class BeanIfGenerator
             @NonNull final MethodSpec getMethod,
             @NonNull final MethodSpec addMethod) {
         return TypeSpec.interfaceBuilder("Bucket")
-                .addModifiers(Modifier.PUBLIC, Modifier.SEALED)
+                .addModifiers(Modifier.PUBLIC)
                 .addMethod(getMethod)
                 .addMethod(addMethod)
                 .build();

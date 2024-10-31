@@ -13,6 +13,9 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 
@@ -21,68 +24,53 @@ import static com.argyriou.di.compiletime.Constants.*;
 @RequiredArgsConstructor
 public final class ContextGenerator
         implements Generator {
-    private final ProcessingEnvironment processingEnv;
-    private final RoundEnvironment roundEnv;
 
     @Override
-    public void generate() {
-        if (classExists(processingEnv, PACKAGE + ".Context")) {
-            return;
-        }
-
+    public void generate(Set<Field> fields, Set<Class<?>> beans) {
         FieldSpec beanBucketField = constructBeanBucketField();
         MethodSpec constructor = constructConstructor();
         MethodSpec getBeanBucket = constructGetBeanBucketMethod();
         MethodSpec.Builder initMethodBuilder = constructInitMethodBuilder();
 
-        performDI(initMethodBuilder);
+        performDI(initMethodBuilder, fields, beans);
 
         TypeSpec contextClass =
                 constructContextClas(beanBucketField, constructor, getBeanBucket, initMethodBuilder);
 
-        writeFileOnClasspath(processingEnv, contextClass);
+        writeFileOnClasspath(contextClass);
     }
 
-    private void performDI(@NonNull final MethodSpec.Builder initMethodBuilder) {
-        Set<? extends Element> beanElements =
-                roundEnv.getElementsAnnotatedWith(Bean.class);
-
-        initBeans(initMethodBuilder, beanElements);
-        addDependencies(initMethodBuilder, beanElements);
+    private void performDI(@NonNull final MethodSpec.Builder initMethodBuilder,
+                           Set<Field> fields,
+                           Set<Class<?>> beans) {
+        initBeans(initMethodBuilder, beans);
+        addDependencies(initMethodBuilder, fields);
     }
 
     private static void addDependencies(
             @NonNull final MethodSpec.Builder initMethodBuilder,
-            @NonNull final Set<? extends Element> beanElements) {
-        beanElements.forEach(be -> {
-            String lowercasedBeanName
-                    = Character.toLowerCase(be.getSimpleName().charAt(0)) + be.getSimpleName().toString().substring(1);
+            @NonNull final Set<Field> fields) {
+        fields.forEach(dep -> {
+            String typeName = dep.getDeclaringClass().getSimpleName();
+            String lowercasedBeanName = Character.toLowerCase(typeName.charAt(0))
+                    + typeName.substring(1);
 
-            List<VariableElement> fields =
-                    ElementFilter.fieldsIn(be.getEnclosedElements())
-                            .stream()
-                            .filter(f -> f.getAnnotation(Inject.class) != null)
-                            .toList();
-
-            fields.forEach(dep -> {
-                TypeName fieldTypeName = ClassName.get(dep.asType());
-                String lowercasedDepName = Character.toLowerCase(dep.getSimpleName().charAt(0))
-                        + dep.getSimpleName().toString().substring(1);
-                initMethodBuilder.addStatement("$L.set$T($L)", lowercasedBeanName, fieldTypeName, lowercasedDepName);
-            });
+            TypeName tn = TypeName.get(dep.getType());
+            initMethodBuilder.addStatement("$L.set$T($L)", lowercasedBeanName, tn, dep.getName());
         });
     }
 
     private static void initBeans(
             @NonNull final MethodSpec.Builder initMethodBuilder,
-            @NonNull final Set<? extends Element> beanElements) {
-        beanElements.forEach(be -> {
-            TypeName typeName = ClassName.get(be.asType());
+            @NonNull final Set<Class<?>> beans) {
+        beans.forEach(be -> {
+            String typeName = be.getSimpleName();
+            TypeName tn = TypeName.get(be);
             String lowercasedBeanName =
-                    Character.toLowerCase(be.getSimpleName().charAt(0))
-                            + be.getSimpleName().toString().substring(1);
+                    Character.toLowerCase(typeName.charAt(0))
+                            + typeName.substring(1);
 
-            initMethodBuilder.addStatement("$T $L = new $T()", typeName, lowercasedBeanName, typeName);
+            initMethodBuilder.addStatement("$T $L = new $T()", tn, lowercasedBeanName, tn);
             initMethodBuilder.addStatement("beanBucket.add($L)", lowercasedBeanName);
         });
     }
@@ -90,11 +78,13 @@ public final class ContextGenerator
     @Override
     @SneakyThrows
     public void writeFileOnClasspath(
-            @NonNull final ProcessingEnvironment processingEnv,
             @NonNull final TypeSpec clazz) {
-        JavaFile javaFile = JavaFile.builder(PACKAGE, clazz)
-                .build();
-        javaFile.writeTo(processingEnv.getFiler());
+        try {
+            JavaFile javaFile = JavaFile.builder(PACKAGE, clazz).build();
+            javaFile.writeTo(Paths.get("target/generated-sources/java"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
